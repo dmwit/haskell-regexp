@@ -3,6 +3,7 @@
 
 module Text.RegExp.Data where
 
+import Data.Monoid
 import Data.Semiring
 
 -- |
@@ -202,3 +203,30 @@ instance Eq (Reg w a) where
   Seq a b == Seq c d  =  a==c && b==d
   Rep a   == Rep b    =  a==b
   _       == _        =  False
+
+instance Ord (RegExp a) where
+  compare p q = compare (regBool p) (regBool q)
+
+instance Ord (RegW w a) where
+  compare p q = compare (reg p) (reg q)
+
+instance Ord (Reg w a) where
+  compare Eps Eps = EQ
+  compare Eps _   = LT
+  compare _   Eps = GT
+
+  compare (Sym s _) (Sym t _) = compare s t
+  compare (Sym {}) _ = LT
+  compare _ (Sym {}) = GT
+
+  compare (Alt a b) (Alt c d) = compare a c `mappend` compare b d
+  compare (Alt {}) _ = LT
+  compare _ (Alt {}) = GT
+
+  compare (Seq a b) (Seq c d) = compare a c `mappend` compare b d
+  compare (Seq {}) _ = LT
+  compare _ (Seq {}) = GT
+
+  compare (Rep a) (Rep b) = compare a b
+  compare (Rep {}) _ = LT
+  compare _ (Rep {}) = GT
