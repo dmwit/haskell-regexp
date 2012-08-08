@@ -168,13 +168,16 @@ brep (n,m) r
 regW :: Semiring w => RegExp c -> RegW w c
 regW (RegExp r) = r
 
-instance Show (RegExp Char) where
-  showsPrec n r = showsPrec n (regW r :: RegW Bool Char)
+regBool :: RegExp c -> RegW Bool c
+regBool = regW
 
-instance Show (RegW Bool Char) where
+instance Show (RegExp a) where
+  showsPrec n r = showsPrec n (regBool r)
+
+instance Show (RegW w a) where
   showsPrec n r = showsPrec n (reg r)
 
-instance Show (Reg Bool Char) where
+instance Show (Reg w a) where
   showsPrec _ Eps        =  showString "()"
   showsPrec _ (Sym s _)  =  showString s
   showsPrec n (Alt p q)  =  showParen (n > 0)
@@ -186,13 +189,13 @@ instance Show (Reg Bool Char) where
                          .  showsPrec 1 q
   showsPrec _ (Rep r)    =  showsPrec 2 r . showString "*"
 
-instance Eq (RegExp Char) where
-  p == q  =  regW p == (regW q :: RegW Bool Char)
+instance Eq (RegExp a) where
+  p == q  =  regBool p == regBool q
 
-instance Eq (RegW Bool Char) where
+instance Eq (RegW w a) where
   p == q  =  reg p == reg q
 
-instance Eq (Reg Bool Char) where
+instance Eq (Reg w a) where
   Eps     == Eps      =  True
   Sym s _ == Sym t _  =  s==t
   Alt a b == Alt c d  =  a==c && b==d
