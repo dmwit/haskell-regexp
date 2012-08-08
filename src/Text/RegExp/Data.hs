@@ -73,7 +73,10 @@ quote :: Char -> String
 quote c | c `elem` " \\|*+?.[]{}^" = '\\' : [c]
         | otherwise                = [c]
 
--- | Matches a symbol that satisfies the given predicate.
+-- |
+-- Matches a symbol that satisfies the given predicate. The 'String' argument
+-- should be a globally-unique identifier for the @c -> Bool@ predicate: it is
+-- used in the 'Show', 'Eq', and 'Ord' instances.
 -- 
 psym :: String -> (c -> Bool) -> RegExp c
 psym s p = RegExp (symW s (fromBool . p))
